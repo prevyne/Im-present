@@ -1,12 +1,78 @@
 import sys
 import csv
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                             QTabWidget, QLabel, QLineEdit, QPushButton, 
-                             QTableWidget, QTableWidgetItem, QComboBox, 
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
+                             QTabWidget, QLabel, QLineEdit, QPushButton,
+                             QTableWidget, QTableWidgetItem, QComboBox,
                              QDateEdit, QHeaderView, QMessageBox, QDialog,
                              QFormLayout, QDialogButtonBox, QMenu, QFileDialog)
 from PyQt6.QtCore import QDate, Qt
 import database
+
+# --- Modern UI Style Sheet (QSS) ---
+MODERN_STYLE = """
+    QWidget {
+        font-family: 'Segoe UI', 'Roboto', 'Arial';
+        font-size: 14px;
+    }
+    QMainWindow, QDialog {
+        background-color: #2c3e50; /* Midnight Blue */
+    }
+    QTabWidget::pane {
+        border: 1px solid #1a242f;
+        background-color: #34495e; /* Wet Asphalt */
+    }
+    QTabBar::tab {
+        background-color: #2c3e50;
+        color: #bdc3c7; /* Silver */
+        padding: 10px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        margin-right: 2px;
+    }
+    QTabBar::tab:selected {
+        background-color: #3498db; /* Peter River Blue */
+        color: #ffffff;
+        font-weight: bold;
+    }
+    QPushButton {
+        background-color: #3498db;
+        color: white;
+        border-radius: 5px;
+        padding: 8px 15px;
+        border: none;
+    }
+    QPushButton:hover {
+        background-color: #2980b9; /* Belize Hole */
+    }
+    QPushButton:pressed {
+        background-color: #1f618d;
+    }
+    QLineEdit, QDateEdit, QComboBox {
+        background-color: #2c3e50;
+        border: 1px solid #1a242f;
+        padding: 5px;
+        border-radius: 4px;
+        color: #e0e0e0;
+    }
+    QTableWidget {
+        background-color: #34495e;
+        border: 1px solid #1a242f;
+        gridline-color: #2c3e50;
+        color: #e0e0e0;
+    }
+    QHeaderView::section {
+        background-color: #2c3e50;
+        color: #ecf0f1;
+        padding: 5px;
+        border: 1px solid #1a242f;
+    }
+    QLabel {
+        color: #ecf0f1; /* Clouds */
+    }
+    QMessageBox {
+        background-color: #34495e;
+    }
+"""
 
 class StudentDialog(QDialog):
     """A dialog for adding or editing student information."""
@@ -24,7 +90,7 @@ class StudentDialog(QDialog):
         self.buttons.accepted.connect(self.accept)
         self.buttons.rejected.connect(self.reject)
         layout.addWidget(self.buttons)
-        
+
     def get_data(self):
         return self.student_id_input.text(), self.full_name_input.text()
 
@@ -40,7 +106,7 @@ class ClassDialog(QDialog):
         self.buttons.accepted.connect(self.accept)
         self.buttons.rejected.connect(self.reject)
         layout.addWidget(self.buttons)
-        
+
     def get_data(self):
         return self.class_name_input.text()
 
@@ -50,15 +116,15 @@ class AttendanceApp(QMainWindow):
         self.setWindowTitle("Class Attendance System")
         self.setGeometry(100, 100, 900, 700)
         database.setup_database()
-        
+
         self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
-        
+
         self.create_attendance_tab()
         self.create_reports_tab()
         self.create_manage_students_tab()
         self.create_manage_classes_tab()
-        
+
         self.refresh_all_data()
 
     def create_attendance_tab(self):
@@ -67,20 +133,20 @@ class AttendanceApp(QMainWindow):
         self.class_selector_att.currentIndexChanged.connect(self.load_students_for_attendance)
         layout.addWidget(QLabel("Select Class:"))
         layout.addWidget(self.class_selector_att)
-        
+
         self.date_edit_att = QDateEdit(calendarPopup=True, date=QDate.currentDate())
         layout.addWidget(QLabel("Select Date:"))
         layout.addWidget(self.date_edit_att)
-        
+
         self.attendance_table = QTableWidget(columnCount=3)
         self.attendance_table.setHorizontalHeaderLabels(["Student ID", "Full Name", "Status"])
         self.attendance_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         layout.addWidget(self.attendance_table)
-        
+
         save_button = QPushButton("Save Attendance")
         save_button.clicked.connect(self.save_attendance)
         layout.addWidget(save_button)
-        
+
         tab.setLayout(layout)
         self.tabs.addTab(tab, "Take Attendance")
 
@@ -89,27 +155,27 @@ class AttendanceApp(QMainWindow):
         self.class_selector_rep = QComboBox()
         layout.addWidget(QLabel("Filter by Class:"))
         layout.addWidget(self.class_selector_rep)
-        
+
         self.start_date_rep = QDateEdit(calendarPopup=True, date=QDate.currentDate().addMonths(-1))
         self.end_date_rep = QDateEdit(calendarPopup=True, date=QDate.currentDate())
         layout.addWidget(QLabel("Start Date:"))
         layout.addWidget(self.start_date_rep)
         layout.addWidget(QLabel("End Date:"))
         layout.addWidget(self.end_date_rep)
-        
+
         generate_button = QPushButton("Generate Report")
         generate_button.clicked.connect(self.generate_report)
         layout.addWidget(generate_button)
-        
+
         self.report_table = QTableWidget(columnCount=4)
         self.report_table.setHorizontalHeaderLabels(["Student ID", "Full Name", "Date", "Status"])
         self.report_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         layout.addWidget(self.report_table)
-        
+
         export_button = QPushButton("Export to CSV")
         export_button.clicked.connect(self.export_report_to_csv)
         layout.addWidget(export_button)
-        
+
         tab.setLayout(layout)
         self.tabs.addTab(tab, "Reports")
 
@@ -118,14 +184,14 @@ class AttendanceApp(QMainWindow):
         add_student_button = QPushButton("Add New Student")
         add_student_button.clicked.connect(self.add_student)
         layout.addWidget(add_student_button)
-        
+
         self.students_table = QTableWidget(columnCount=2)
         self.students_table.setHorizontalHeaderLabels(["Student ID", "Full Name"])
         self.students_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         self.students_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.students_table.customContextMenuRequested.connect(self.open_student_menu)
         layout.addWidget(self.students_table)
-        
+
         tab.setLayout(layout)
         self.tabs.addTab(tab, "Manage Students")
 
@@ -134,19 +200,19 @@ class AttendanceApp(QMainWindow):
         form_layout = QFormLayout()
         self.class_name_input = QLineEdit()
         form_layout.addRow("Class Name:", self.class_name_input)
-        
+
         add_class_button = QPushButton("Add Class")
         add_class_button.clicked.connect(self.add_class)
         form_layout.addWidget(add_class_button)
         layout.addLayout(form_layout)
-        
+
         self.classes_table = QTableWidget(columnCount=2)
         self.classes_table.setHorizontalHeaderLabels(["Class ID", "Class Name"])
         self.classes_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         self.classes_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.classes_table.customContextMenuRequested.connect(self.open_class_menu)
         layout.addWidget(self.classes_table)
-        
+
         tab.setLayout(layout)
         self.tabs.addTab(tab, "Manage Classes")
 
@@ -154,7 +220,7 @@ class AttendanceApp(QMainWindow):
         self.load_classes()
         self.load_students()
         self.load_students_for_attendance()
-    
+
     def load_classes(self):
         classes = database.get_classes()
         self.class_selector_att.clear()
@@ -182,7 +248,7 @@ class AttendanceApp(QMainWindow):
         if not class_id:
             self.attendance_table.setRowCount(0)
             return
-        
+
         # Simplified: shows all students. For a real app, you'd use get_students_by_class(class_id).
         students = database.get_students()
         self.attendance_table.setRowCount(len(students))
@@ -233,7 +299,7 @@ class AttendanceApp(QMainWindow):
         if row < 0: return
         class_id = int(self.classes_table.item(row, 0).text())
         class_name = self.classes_table.item(row, 1).text()
-        confirm = QMessageBox.question(self, "Confirm Delete", 
+        confirm = QMessageBox.question(self, "Confirm Delete",
             f"Delete class '{class_name}'? All related records will be lost.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if confirm == QMessageBox.StandardButton.Yes:
@@ -281,7 +347,7 @@ class AttendanceApp(QMainWindow):
         row = self.students_table.currentRow()
         if row < 0: return
         student_id = self.students_table.item(row, 0).text()
-        confirm = QMessageBox.question(self, "Confirm Delete", 
+        confirm = QMessageBox.question(self, "Confirm Delete",
             f"Delete student {student_id}? All related records will be lost.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if confirm == QMessageBox.StandardButton.Yes:
@@ -301,7 +367,7 @@ class AttendanceApp(QMainWindow):
             status = self.attendance_table.cellWidget(row, 2).currentText()
             database.mark_attendance(student_id, class_id, date_str, status)
         QMessageBox.information(self, "Success", "Attendance saved successfully.")
-        
+
     def generate_report(self):
         class_id = self.class_selector_rep.currentData()
         if not class_id:
@@ -337,6 +403,9 @@ class AttendanceApp(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setStyleSheet(MODERN_STYLE)
+
     main_window = AttendanceApp()
     main_window.show()
+
     sys.exit(app.exec())
