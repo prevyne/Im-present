@@ -1,7 +1,7 @@
-Im-present: Class Attendance System
+# Im-present: Class Attendance System
 Im-present is a modern, intuitive desktop application designed to simplify the process of tracking student attendance. Built with Python and PyQt6, it provides a clean, colorful interface for managing students, classes, and attendance records efficiently.
 
- Features
+ ## Features
 Full Student Management: Add, edit, and delete student profiles with ease.
 
 Complete Class Management: Create, update, and delete classes.
@@ -16,10 +16,10 @@ Modern Themed UI: A visually appealing dark theme with vibrant colors makes the 
 
 Persistent Storage: All data is saved locally in an SQLite database (attendance.db), ensuring your information is preserved between sessions.
 
-Getting Started
+# Getting Started
 Follow these instructions to get the application running on your local machine.
 
-Prerequisites
+## Prerequisites
 You will need the following software installed on your system:
 
 Python 3: Version 3.6 or newer.
@@ -30,7 +30,7 @@ You can install the required Python library using pip:
 
 pip install PyQt6
 
-How to Run
+## How to Run
 Clone or download the project files (main.py and database.py) into a single directory.
 
 Open your terminal or command prompt.
@@ -45,7 +45,7 @@ python3 main.py
 
 The application window should now appear on your screen. The first time you run it, a new database file named attendance.db will be created automatically in the same folder.
 
- Usage Guide
+ ## Usage Guide
  Managing Students
 Go to the "Manage Students" tab.
 
@@ -53,14 +53,14 @@ Add: Click the "Add New Student" button, fill in the details in the dialog, and 
 
 Edit/Delete: Right-click on a student in the table to bring up a context menu with "Edit Student" and "Delete Student" options.
 
- Managing Classes
+### Managing Classes
 Go to the "Manage Classes" tab.
 
 Add: Type the class name into the input field and click the "Add Class" button.
 
 Edit/Delete: Right-click on a class in the table to open a context menu with "Edit Class" and "Delete Class" options.
 
- Taking Attendance
+### Taking Attendance
 Go to the "Take Attendance" tab.
 
 Select the desired class from the dropdown menu.
@@ -71,7 +71,7 @@ For each student, select their status ("Present", "Absent", "Late") from the dro
 
 Click the "Save Attendance" button to record the data.
 
- Generating Reports
+### Generating Reports
 Go to the "Reports" tab.
 
 Select the class you want a report for.
